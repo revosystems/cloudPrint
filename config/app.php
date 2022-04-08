@@ -108,6 +108,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'allowed_domains' => env('ALLOWED_DOMAINS', 'https://revointouch.works,https://solo.revointouch.works,https://staging.revointouch.works,https://sandbox.revointouch.works'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

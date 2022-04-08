@@ -15,7 +15,7 @@ class Cors
      */
     public function handle($request, Closure $next)
     {
-        $acceptedOrigins = explode(',', env('ALLOWED_DOMAINS'));
+        $acceptedOrigins = explode(',', config('app.allowed_domains'));
         $origin = $request->headers->get('origin');
 
         $headers = in_array($origin, $acceptedOrigins)
