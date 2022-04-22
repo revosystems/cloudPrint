@@ -14,4 +14,9 @@ class PrintJobController extends Controller
         ]);
         return response(["id" => $printJob->id]);
     }
+
+    public function status(PrintJob $printJob)
+    {
+        return response(['status' => $printJob->statusLabel]);
+    }
 }

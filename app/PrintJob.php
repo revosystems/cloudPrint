@@ -22,4 +22,14 @@ class PrintJob extends Model
     {
         return $query->where('status', PrintJob::STATUS_PRINTING);
     }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return [
+            static::STATUS_ERROR => 'error',
+            static::STATUS_PRINTED => 'printed',
+            static::STATUS_PRINTING => 'printing',
+            static::STATUS_PENDING => 'pending',
+        ][$this->status];
+    }
 }
