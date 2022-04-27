@@ -14,7 +14,6 @@ class EpsonPrintJobController extends Controller
     {
         $connectionType = request('ConnectionType');
         $id             = request('ID');
-        Log::info("EPSON print jobs called {$connectionType} for ID: {$id}");
 
         $this->savePrinterStatus($id);
 
@@ -50,9 +49,6 @@ class EpsonPrintJobController extends Controller
         $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PrintRequestInfo>" .
             $printJobs->pluck('job')->implode('') . "</PrintRequestInfo>";
 
-        //$xml = file_get_contents(resource_path('samples') . '/provaJordi.xml');
-//        $xml = file_get_contents(resource_path('samples') . '/sample.xml');
-//        return response($xml)->withHeaders([
         return response($xml)->withHeaders([
             'Content-Type' => 'text/xml; charset=UTF-8'
         ]);
@@ -60,14 +56,21 @@ class EpsonPrintJobController extends Controller
 
     private function setResponse($id)
     {
-        //TODO: Fix this with status;
+        logger(request('ResponseFile'));
         $xml = simplexml_load_string(request('ResponseFile'));
         if (count($xml->response) != 0) {
+            $printJobs = PrintJob::printing()->whereUuid($id)->get();
             foreach ($xml->response as $response) {
-                Log::info("success : {$response['success']} code : {$response['code']}");
+                $printJob = $printJobs->shift();
+                $printJob->update([
+                    'status' => $response['success']->__toString() === 'true'
+                        ? PrintJob::STATUS_PRINTED
+                        : PrintJob::STATUS_ERROR
+                ]);
+                Log::info("Print job  with id {$printJob->id} finished with success: {$response['success']} and code: {$response['code']}");
             }
         }
-        PrintJob::printing()->where('uuid', $id)->delete();
+
         return response("");
     }
 }
